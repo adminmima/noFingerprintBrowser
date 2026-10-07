@@ -4,8 +4,9 @@
 
     <application
         android:allowBackup="false"
-        android:label="noFP"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        android:label="NoFingerprintBrowser"
+        android:description="无指纹浏览器"
+        android:theme="@android:style/Theme.Material.NoActionBar"
         android:usesCleartextTraffic="false">
 
         <activity
@@ -18,9 +19,9 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="false"
-            android:label="设置" />
+        <activity android:name=".SettingsActivity" android:exported="false" android:label="设置" />
+        <activity android:name=".AdvancedSettingsActivity" android:exported="false" android:label="高级设置" />
+        <activity android:name=".HistoryActivity" android:exported="false" android:label="历史记录" />
+        <activity android:name=".BookmarksActivity" android:exported="false" android:label="收藏夹" />
     </application>
 </manifest>
