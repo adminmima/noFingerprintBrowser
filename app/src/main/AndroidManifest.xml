@@ -5,7 +5,6 @@
     <application
         android:allowBackup="false"
         android:label="NoFingerprintBrowser"
-        android:description="无指纹浏览器"
         android:theme="@android:style/Theme.Material.NoActionBar"
         android:usesCleartextTraffic="false">
 
