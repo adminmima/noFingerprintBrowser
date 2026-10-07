@@ -28,7 +28,6 @@ public class MainActivity extends Activity {
         if (runtime == null) {
             runtime = GeckoRuntime.create(this, PrivacyConfig.buildSettings(this));
         }
-        // 每次启动都重新写 prefs，让设置生效
         try {
             java.io.File f = new java.io.File(getFilesDir(), "gecko-prefs.txt");
             java.io.FileWriter fw = new java.io.FileWriter(f);
@@ -69,6 +68,10 @@ public class MainActivity extends Activity {
         setContentView(root);
 
         addTab(null);
+
+        // 从历史/收藏跳过来时带上 load_url
+        String extraUrl = getIntent().getStringExtra("load_url");
+        if (extraUrl != null && !extraUrl.isEmpty()) loadUrl(extraUrl);
     }
 
     private Button btn(String text, View.OnClickListener l) {
@@ -104,17 +107,13 @@ public class MainActivity extends Activity {
                 if (idx >= 0) {
                     tabUrls.set(idx, u == null ? "" : u);
                     if (idx == currentTab) runOnUiThread(() -> urlBar.setText(u));
-                }
-            }
-        });
-
-        session.setHistoryDelegate(new GeckoSession.HistoryDelegate() {
-            @Override
-            public void onHistoryStateChange(GeckoSession s, HistoryList list) {
-                if (!ThemeHelper.isHistoryEnabled(MainActivity.this)) return;
-                if (list.size() > 0 && list.getCurrentIndex() >= 0) {
-                    HistoryList.Entry e = list.get(list.getCurrentIndex());
-                    HistoryStorage.add(MainActivity.this, e.mUrl, e.mTitle, System.currentTimeMillis());
+                    // 用 URL 变化来记历史
+                    if (ThemeHelper.isHistoryEnabled(MainActivity.this)
+                        && u != null && !u.isEmpty()
+                        && (u.startsWith("http://") || u.startsWith("https://"))) {
+                        String title = idx < tabTitles.size() ? tabTitles.get(idx) : u;
+                        HistoryStorage.add(MainActivity.this, u, title, System.currentTimeMillis());
+                    }
                 }
             }
         });

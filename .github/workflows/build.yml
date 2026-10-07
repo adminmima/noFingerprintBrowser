@@ -25,13 +25,27 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.11.1"
+          cache-read-only: false
+
+      - name: "缓存 Android SDK 目录"
+        uses: actions/cache@v4
+        with:
+          path: ~/.android-sdk-extra
+          key: android-sdk-36-${{ runner.os }}
 
       - name: "安装 Android SDK（android-36 + build-tools 36）"
         run: |
-          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
-            "platforms;android-36" "build-tools;36.0.0" > /dev/null
+          SDK_DIR="$HOME/.android-sdk-extra"
+          mkdir -p "$SDK_DIR"
+          if [ ! -d "$SDK_DIR/platforms/android-36" ]; then
+            yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+              --sdk_root="$SDK_DIR" \
+              "platforms;android-36" "build-tools;36.0.0" > /dev/null
+          fi
+          echo "ANDROID_HOME=$SDK_DIR" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$SDK_DIR" >> $GITHUB_ENV
 
-      - name: "选取 GeckoView 版本（取倒数第 5 个，约 5 天前，避开刚要求 compileSdk 37 的版本）"
+      - name: "选取 GeckoView 版本（取倒数第 5 个，约 5 天前）"
         id: gv
         run: |
           VER=$(curl -sf "https://maven.mozilla.org/maven2/org/mozilla/geckoview/geckoview-nightly-omni-arm64-v8a/maven-metadata.xml" \
