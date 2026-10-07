@@ -26,8 +26,6 @@ public class MainActivity extends Activity {
 
             GeckoRuntimeSettings.Builder b = new GeckoRuntimeSettings.Builder()
                 .configFilePath(new java.io.File(getFilesDir(), "gecko-prefs.txt").getAbsolutePath())
-                .telemetryEnabled(false)
-                .crashHandler(null)
                 .contentBlocking(new ContentBlocking.Settings.Builder()
                     .enhancedTrackingProtectionLevel(ContentBlocking.EtpLevel.STRICT)
                     .build());
