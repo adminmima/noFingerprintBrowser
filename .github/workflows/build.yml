@@ -15,37 +15,31 @@ jobs:
       - name: "拉取代码"
         uses: actions/checkout@v4
 
-      - name: "安装 JDK 21"
+      - name: "安装 JDK 17"
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
-          java-version: "21"
+          java-version: "17"
 
-      - name: "安装 Gradle 9.0"
+      - name: "安装 Gradle 8.11.1"
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "9.0.0"
+          gradle-version: "8.11.1"
 
-      - name: "查看可用的 android-3x 平台"
-        run: |
-          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --list 2>&1 \
-            | grep -E "platforms;android-3[0-9]|platforms;android-.*preview" | sort -u | head -30
-          echo "------ canary 通道 ------"
-          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --channel=3 --list 2>&1 \
-            | grep -E "platforms;android-3[0-9]|platforms;android-.*preview" | sort -u | head -30
-
-      - name: "安装 Android SDK 平台和构建工具"
+      - name: "安装 Android SDK（android-36 + build-tools 36）"
         run: |
           yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
-            --channel=3 "platforms;android-37" "build-tools;37.0.0" > /dev/null 2>&1 \
-            || yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
-              "platforms;android-36" "build-tools;36.0.0" > /dev/null
+            "platforms;android-36" "build-tools;36.0.0" > /dev/null
 
-      - name: "查询 GeckoView Nightly 最新版本号"
+      - name: "选取 GeckoView 版本（取倒数第 5 个，约 5 天前，避开刚要求 compileSdk 37 的版本）"
         id: gv
         run: |
           VER=$(curl -sf "https://maven.mozilla.org/maven2/org/mozilla/geckoview/geckoview-nightly-omni-arm64-v8a/maven-metadata.xml" \
-            | grep -oP '(?<=<latest>)[^<]+' | head -1)
+            | grep -oP '(?<=<version>)[^<]+' | tail -5 | head -1)
+          if [ -z "$VER" ]; then
+            VER=$(curl -sf "https://maven.mozilla.org/maven2/org/mozilla/geckoview/geckoview-nightly-omni-arm64-v8a/maven-metadata.xml" \
+              | grep -oP '(?<=<latest>)[^<]+' | head -1)
+          fi
           echo "version=$VER" >> $GITHUB_OUTPUT
           echo "本次使用的 GeckoView 版本：$VER"
 
