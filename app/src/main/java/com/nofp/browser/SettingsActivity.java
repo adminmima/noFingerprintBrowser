@@ -69,8 +69,10 @@ public class SettingsActivity extends Activity {
 
         Switch sw = new Switch(this);
         sw.setChecked(sp.getBoolean(key, def));
-        sw.setOnCheckedChangeListener((btn, checked) ->
-            sp.edit().putBoolean(key, checked).apply());
+        sw.setOnCheckedChangeListener((btn, checked) -> {
+            sp.edit().putBoolean(key, checked).apply();
+            if ("dark_mode".equals(key)) recreate();
+        });
         row.addView(sw);
 
         root.addView(row);

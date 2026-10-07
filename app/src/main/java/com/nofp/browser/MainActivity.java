@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
         try {
             java.io.File f = new java.io.File(getFilesDir(), "gecko-prefs.txt");
             java.io.FileWriter fw = new java.io.FileWriter(f);
-            fw.write(PrivacyConfig.buildPrefsFile(this));
+            fw.write(PrivacyConfig.buildPrefsFile(this) + PrivacyConfig.buildAdvancedOverrides(this));
             fw.close();
         } catch (Exception ignored) {}
 
@@ -72,6 +72,18 @@ public class MainActivity extends Activity {
         // 从历史/收藏跳过来时带上 load_url
         String extraUrl = getIntent().getStringExtra("load_url");
         if (extraUrl != null && !extraUrl.isEmpty()) loadUrl(extraUrl);
+    }
+
+    private Boolean lastDark = null;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        boolean nowDark = ThemeHelper.isDark(this);
+        if (lastDark != null && lastDark != nowDark) {
+            recreate();
+        }
+        lastDark = nowDark;
     }
 
     private Button btn(String text, View.OnClickListener l) {

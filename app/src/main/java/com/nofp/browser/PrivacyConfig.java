@@ -618,4 +618,23 @@ public class PrivacyConfig {
         {"扩展","browser.newtabpage.activity-stream.discoverystream.sponsored-collections.enabled","赞助合集","赞助合集","false","bool"},
         {"扩展","browser.newtabpage.activity-stream.feeds.section.highlights","亮点","亮点推荐","false","bool"}
     };
+
+    public static String buildAdvancedOverrides(Context ctx) {
+        SharedPreferences adv = ctx.getSharedPreferences("privacy_advanced", Context.MODE_PRIVATE);
+        StringBuilder sb = new StringBuilder();
+        for (String[] item : ADVANCED) {
+            if (item.length < 6) continue;
+            String key = item[1];
+            String type = item[5];
+            if (adv.contains(key)) {
+                if (type.equals("bool")) {
+                    sb.append(key).append("=").append(adv.getBoolean(key, false)).append("\n");
+                } else {
+                    sb.append(key).append("=").append(adv.getString(key, "")).append("\n");
+                }
+            }
+        }
+        return sb.toString();
+    }
+
 }
